@@ -19,14 +19,14 @@ void execute_cmd(char *cmd_str, char **envp)
     if (!cmd_path)
     {
         write(2, "Command not found\n", 18);
-        free_split(args);
+        ft_free_split(args);
         exit(127);
     }
 
     execve(cmd_path, args, envp);
 
     perror("execve");
-    free_split(args);
+    ft_free_split(args);
     free(cmd_path);
     exit(1);
 }

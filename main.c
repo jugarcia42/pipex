@@ -28,6 +28,19 @@ static void	child_two(int *fd, char **argv, char **envp)
 	execute_cmd(argv[3], envp);
 }
 
+static int	wait_and_return(pid_t pid1, pid_t pid2, int *fd)
+{
+	int	status;
+
+	close(fd[0]);
+	close(fd[1]);
+	waitpid(pid1, NULL, 0);
+	waitpid(pid2, &status, 0);
+	if (WIFEXITED(status))
+		return (WEXITSTATUS(status));
+	return (1);
+}
+
 int	main(int argc, char **argv, char **envp)
 {
 	int		fd[2];
@@ -47,9 +60,5 @@ int	main(int argc, char **argv, char **envp)
 	pid2 = fork();
 	if (pid2 == 0)
 		child_two(fd, argv, envp);
-	close(fd[0]);
-	close(fd[1]);
-	waitpid(pid1, NULL, 0);
-	waitpid(pid2, NULL, 0);
-	return (0);
+	return (wait_and_return(pid1, pid2, fd));
 }

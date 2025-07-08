@@ -70,3 +70,17 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	res[i + j] = '\0';
 	return (res);
 }
+void	ft_free_split(char **arr)
+{
+	int	i;
+
+	i = 0;
+	if (!arr)
+		return ;
+	while (arr[i])
+	{
+		free(arr[i]);
+		i++;
+	}
+	free(arr);
+}

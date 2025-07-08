@@ -1,5 +1,7 @@
 #include "pipex.h"
 #include <sys/wait.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <stdio.h>
 
 static void	child_one(int *fd, char **argv, char **envp)
@@ -12,6 +14,8 @@ static void	child_one(int *fd, char **argv, char **envp)
 	dup2(infile, 0);
 	dup2(fd[1], 1);
 	close(fd[0]);
+	close(fd[1]);
+	close(infile);
 	execute_cmd(argv[2], envp);
 }
 
@@ -25,6 +29,8 @@ static void	child_two(int *fd, char **argv, char **envp)
 	dup2(fd[0], 0);
 	dup2(outfile, 1);
 	close(fd[1]);
+	close(fd[0]);
+	close(outfile);
 	execute_cmd(argv[3], envp);
 }
 
@@ -36,9 +42,7 @@ static int	wait_and_return(pid_t pid1, pid_t pid2, int *fd)
 	close(fd[1]);
 	waitpid(pid1, NULL, 0);
 	waitpid(pid2, &status, 0);
-	if (WIFEXITED(status))
-		return (WEXITSTATUS(status));
-	return (1);
+	return ((status >> 8) & 0xFF);
 }
 
 int	main(int argc, char **argv, char **envp)

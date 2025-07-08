@@ -9,7 +9,7 @@ static int	word_count(const char *s, char c)
 	in_word = 0;
 	while (*s)
 	{
-		if (*s != c && in_word == 0)
+		if (*s != c && !in_word)
 		{
 			in_word = 1;
 			count++;
@@ -36,16 +36,12 @@ static char	*dup_word(const char *s, int start, int end)
 	return (word);
 }
 
-char	**ft_split(char const *s, char c)
+static int	fill_split(char **res, const char *s, char c)
 {
-	char	**res;
-	int		i;
-	int		j;
-	int		start;
+	int	i;
+	int	j;
+	int	start;
 
-	res = malloc(sizeof(char *) * (word_count(s, c) + 1));
-	if (!res)
-		return (NULL);
 	i = 0;
 	j = 0;
 	start = -1;
@@ -61,5 +57,18 @@ char	**ft_split(char const *s, char c)
 		i++;
 	}
 	res[j] = NULL;
+	return (1);
+}
+
+char	**ft_split(char const *s, char c)
+{
+	char	**res;
+
+	if (!s)
+		return (NULL);
+	res = malloc(sizeof(char *) * (word_count(s, c) + 1));
+	if (!res)
+		return (NULL);
+	fill_split(res, s, c);
 	return (res);
 }

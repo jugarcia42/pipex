@@ -25,26 +25,26 @@ void	execute_cmd(char *cmd_str, char **envp)
 	if (!args || !args[0])
 	{
 		write(2, "Invalid command\n", 16);
-		exit(1);
+		exit(127);
 	}
 	cmd_path = get_cmd_path(args[0], envp);
 	if (!cmd_path)
 	{
-  	  write(2, "Command not found\n", 18);
-  	  ft_free_split(args);
-    	exit(127);
+		write(2, "Command not found\n", 18);
+		ft_free_split(args);
+		exit(127);
 	}
 	if (ft_strcmp(cmd_path, "NO_EXEC_PERMISSION") == 0)
 	{
-	    write(2, "Permission denied\n", 18);
-	    ft_free_split(args);
-	    free(cmd_path);
-	    exit(126);
+		write(2, "Permission denied\n", 18);
+		ft_free_split(args);
+		free(cmd_path);
+		exit(126);
 	}
-
 	execve(cmd_path, args, envp);
 	perror("execve");
 	ft_free_split(args);
 	free(cmd_path);
-	exit(1);
+	exit(126);
 }
+

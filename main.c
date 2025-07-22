@@ -58,8 +58,16 @@ static int	wait_and_return(pid_t pid1, pid_t pid2, int *fd)
 
 	close(fd[0]);
 	close(fd[1]);
+
 	waitpid(pid1, NULL, 0);
 	waitpid(pid2, &status, 0);
+
+	if ((status & 0x7F) != 0)
+	{
+		int	signal_code = status & 0x7F;
+		write(2, "Command terminated by signal\n", 30);
+		return (128 + signal_code);
+	}
 	return ((status >> 8) & 0xFF);
 }
 

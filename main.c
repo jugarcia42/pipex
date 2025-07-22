@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <sys/wait.h>
 #include <fcntl.h>
+#include <stdlib.h>
 
 static void	child_one(int *fd, char **argv, char **envp)
 {
@@ -52,23 +53,27 @@ static void	child_two(int *fd, char **argv, char **envp)
 	execute_cmd(argv[3], envp);
 }
 
-static int	wait_and_return(pid_t pid1, pid_t pid2, int *fd)
+static void	wait_and_check(pid_t pid, char *cmd)
 {
 	int	status;
 
-	close(fd[0]);
-	close(fd[1]);
-
-	waitpid(pid1, NULL, 0);
-	waitpid(pid2, &status, 0);
-
-	if ((status & 0x7F) != 0)
+	waitpid(pid, &status, 0);
+	if (WIFEXITED(status))
 	{
-		int	signal_code = status & 0x7F;
-		write(2, "Command terminated by signal\n", 30);
-		return (128 + signal_code);
+		int code = WEXITSTATUS(status);
+		if (code == 127)
+			fprintf(stderr, "Command not found: %s\n", cmd);
+		else if (code == 126)
+			fprintf(stderr, "Permission denied: %s\n", cmd);
+		exit(code);
 	}
-	return ((status >> 8) & 0xFF);
+	else if (WIFSIGNALED(status))
+	{
+		int sig = WTERMSIG(status);
+		fprintf(stderr, "Command '%s' terminated by signal %d\n", cmd, sig);
+		exit(128 + sig);
+	}
+	exit(1);
 }
 
 static int	setup_and_fork(int *fd, char **argv, char **envp)
@@ -77,12 +82,29 @@ static int	setup_and_fork(int *fd, char **argv, char **envp)
 	pid_t	pid2;
 
 	pid1 = fork();
+	if (pid1 < 0)
+	{
+		perror("fork");
+		exit(1);
+	}
 	if (pid1 == 0)
 		child_one(fd, argv, envp);
+
 	pid2 = fork();
+	if (pid2 < 0)
+	{
+		perror("fork");
+		exit(1);
+	}
 	if (pid2 == 0)
 		child_two(fd, argv, envp);
-	return (wait_and_return(pid1, pid2, fd));
+
+	close(fd[0]);
+	close(fd[1]);
+
+	wait_and_check(pid1, argv[2]);
+	wait_and_check(pid2, argv[3]);
+	return (0); // nunca llegará aquí si wait_and_check llama a exit
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -101,3 +123,4 @@ int	main(int argc, char **argv, char **envp)
 	}
 	return (setup_and_fork(fd, argv, envp));
 }
+

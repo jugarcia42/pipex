@@ -22,5 +22,7 @@ void	ft_free_split(char **arr);
 
 void	execute_cmd(char *cmd_str, char **envp);
 char	*get_cmd_path(char *cmd, char **envp);
+int		setup_and_fork(int *fd, char **argv, char **envp);
 
 #endif
+

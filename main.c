@@ -11,9 +11,6 @@
 /* ************************************************************************** */
 
 #include "pipex.h"
-#include <unistd.h>
-#include <stdlib.h>
-#include <fcntl.h>
 
 static int	validate_args(int argc)
 {

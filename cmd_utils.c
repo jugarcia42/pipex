@@ -37,17 +37,11 @@ static char	**get_paths(char **envp)
 	return (ft_split(envp[i] + 5, ':'));
 }
 
-char	*get_cmd_path(char *cmd, char **envp)
+static char	*search_path(char **paths, char *cmd, int *found_no_exec)
 {
-	char	**paths;
-	char	*full;
 	int		i;
-	int		found_no_exec;
+	char	*full;
 
-	paths = get_paths(envp);
-	if (!paths)
-		return (NULL);
-	found_no_exec = 0;
 	i = 0;
 	while (paths[i])
 	{
@@ -57,18 +51,32 @@ char	*get_cmd_path(char *cmd, char **envp)
 		if (access(full, F_OK) == 0)
 		{
 			if (access(full, X_OK) == 0)
-			{
-				ft_free_split(paths);
 				return (full);
-			}
 			else
-				found_no_exec = 1;
+				*found_no_exec = 1;
 		}
 		free(full);
 		i++;
 	}
+	return (NULL);
+}
+
+char	*get_cmd_path(char *cmd, char **envp)
+{
+	char	**paths;
+	char	*full;
+	int		found_no_exec;
+
+	paths = get_paths(envp);
+	if (!paths)
+		return (NULL);
+	found_no_exec = 0;
+	full = search_path(paths, cmd, &found_no_exec);
 	ft_free_split(paths);
+	if (full)
+		return (full);
 	if (found_no_exec)
 		return (ft_strdup("NO_EXEC_PERMISSION"));
 	return (NULL);
 }
+

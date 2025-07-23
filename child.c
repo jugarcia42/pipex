@@ -11,10 +11,6 @@
 /* ************************************************************************** */
 
 #include "pipex.h"
-#include <unistd.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <stdio.h>
 
 void	child_one(int *fd, char **argv, char **envp)
 {

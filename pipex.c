@@ -11,9 +11,6 @@
 /* ************************************************************************** */
 
 #include "pipex.h"
-#include "libft/libft.h"
-#include <stdlib.h>
-#include <unistd.h>
 
 static void	free_and_exit(char **args, char *cmd_path, int code)
 {

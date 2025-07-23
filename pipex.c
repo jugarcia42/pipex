@@ -14,7 +14,14 @@
 #include "libft/libft.h"
 #include <stdlib.h>
 #include <unistd.h>
-#include <stdio.h>
+
+static void	free_and_exit(char **args, char *cmd_path, int code)
+{
+	ft_free_split(args);
+	if (cmd_path)
+		free(cmd_path);
+	exit(code);
+}
 
 void	execute_cmd(char *cmd_str, char **envp)
 {
@@ -29,22 +36,10 @@ void	execute_cmd(char *cmd_str, char **envp)
 	}
 	cmd_path = get_cmd_path(args[0], envp);
 	if (!cmd_path)
-	{
-		write(2, "Command not found\n", 18);
-		ft_free_split(args);
-		exit(127);
-	}
+		free_and_exit(args, NULL, 127);
 	if (ft_strcmp(cmd_path, "NO_EXEC_PERMISSION") == 0)
-	{
-		write(2, "Permission denied\n", 18);
-		ft_free_split(args);
-		free(cmd_path);
-		exit(126);
-	}
+		free_and_exit(args, cmd_path, 126);
 	execve(cmd_path, args, envp);
 	perror("execve");
-	ft_free_split(args);
-	free(cmd_path);
-	exit(126);
+	free_and_exit(args, cmd_path, 126);
 }
-

@@ -28,7 +28,7 @@ static char	*join_path_cmd(char *path, char *cmd)
 
 static char	**get_paths(char **envp)
 {
-	int		i;
+	int	i;
 
 	i = 0;
 	while (envp[i] && ft_strncmp(envp[i], "PATH=", 5) != 0)
@@ -38,40 +38,38 @@ static char	**get_paths(char **envp)
 	return (ft_split(envp[i] + 5, ':'));
 }
 
-char *get_cmd_path(char *cmd, char **envp)
+char	*get_cmd_path(char *cmd, char **envp)
 {
-    char **paths;
-    char *full;
-    int i;
-    int found_no_exec = 0;
+	char	**paths;
+	char	*full;
+	int		i;
+	int		found_no_exec;
 
-    paths = get_paths(envp);
-    if (!paths)
-        return (NULL);
-
-    i = 0;
-    while (paths[i])
-    {
-        full = join_path_cmd(paths[i], cmd);
-        if (!full)
-            break ;
-        if (access(full, F_OK) == 0) // El archivo existe
-        {
-            if (access(full, X_OK) == 0) // El archivo es ejecutable
-            {
-                ft_free_split(paths);
-                return (full);
-            }
-            else
-                found_no_exec = 1; // Archivo existe pero sin permiso
-        }
-        free(full);
-        i++;
-    }
-    ft_free_split(paths);
-
-    if (found_no_exec)
-        return (ft_strdup("NO_EXEC_PERMISSION"));
-    return (NULL);
+	paths = get_paths(envp);
+	if (!paths)
+		return (NULL);
+	found_no_exec = 0;
+	i = 0;
+	while (paths[i])
+	{
+		full = join_path_cmd(paths[i], cmd);
+		if (!full)
+			break ;
+		if (access(full, F_OK) == 0)
+		{
+			if (access(full, X_OK) == 0)
+			{
+				ft_free_split(paths);
+				return (full);
+			}
+			else
+				found_no_exec = 1;
+		}
+		free(full);
+		i++;
+	}
+	ft_free_split(paths);
+	if (found_no_exec)
+		return (ft_strdup("NO_EXEC_PERMISSION"));
+	return (NULL);
 }
-

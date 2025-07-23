@@ -12,7 +12,6 @@
 
 #include "pipex.h"
 #include <unistd.h>
-#include <stdio.h>
 #include <sys/wait.h>
 #include <fcntl.h>
 #include <stdlib.h>
@@ -60,36 +59,35 @@ static void	wait_and_check(pid_t pid, char *cmd)
 	int	signal_code;
 
 	waitpid(pid, &status, 0);
-	if ((status & 0x7F) == 0) // proceso terminó normalmente
+	if ((status & 0x7F) == 0)
 	{
 		exit_code = (status >> 8) & 0xFF;
 		if (exit_code == 127)
 		{
-			write(2, "Command not found: ", 20);
+			write(2, "Command not found: ", 19);
 			write(2, cmd, ft_strlen(cmd));
 			write(2, "\n", 1);
 		}
 		else if (exit_code == 126)
 		{
-			write(2, "Permission denied: ", 20);
+			write(2, "Permission denied: ", 19);
 			write(2, cmd, ft_strlen(cmd));
 			write(2, "\n", 1);
 		}
 		exit(exit_code);
 	}
-	else if ((status & 0x7F) != 0) // terminó por señal
+	else if ((status & 0x7F) != 0)
 	{
 		signal_code = status & 0x7F;
 		write(2, "Command '", 9);
 		write(2, cmd, ft_strlen(cmd));
-		write(2, "' terminated by signal ", 24);
-		ft_putnbr_fd(128 + signal_code, 2); // si tienes esta función en libft
+		write(2, "' terminated by signal ", 23);
+		ft_putnbr_fd(128 + signal_code, 2);
 		write(2, "\n", 1);
 		exit(128 + signal_code);
 	}
 	exit(1);
 }
-
 
 static int	setup_and_fork(int *fd, char **argv, char **envp)
 {
@@ -104,7 +102,6 @@ static int	setup_and_fork(int *fd, char **argv, char **envp)
 	}
 	if (pid1 == 0)
 		child_one(fd, argv, envp);
-
 	pid2 = fork();
 	if (pid2 < 0)
 	{
@@ -113,13 +110,11 @@ static int	setup_and_fork(int *fd, char **argv, char **envp)
 	}
 	if (pid2 == 0)
 		child_two(fd, argv, envp);
-
 	close(fd[0]);
 	close(fd[1]);
-
 	wait_and_check(pid1, argv[2]);
 	wait_and_check(pid2, argv[3]);
-	return (0); // nunca llegará aquí si wait_and_check llama a exit
+	return (0);
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -128,7 +123,7 @@ int	main(int argc, char **argv, char **envp)
 
 	if (argc != 5)
 	{
-		write(2, "Usage: ./pipex infile cmd1 cmd2 outfile\n", 41);
+		write(2, "Usage: ./pipex infile cmd1 cmd2 outfile\n", 40);
 		return (1);
 	}
 	if (pipe(fd) == -1)
@@ -138,4 +133,3 @@ int	main(int argc, char **argv, char **envp)
 	}
 	return (setup_and_fork(fd, argv, envp));
 }
-

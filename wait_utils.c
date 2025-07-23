@@ -11,9 +11,6 @@
 /* ************************************************************************** */
 
 #include "pipex.h"
-#include <unistd.h>
-#include <stdlib.h>
-#include "libft/libft.h"
 
 static void	handle_exit_code(int exit_code, char *cmd)
 {

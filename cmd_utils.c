@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "pipex.h"
-#include "libft/libft.h"
 
 static char	*join_path_cmd(char *path, char *cmd)
 {

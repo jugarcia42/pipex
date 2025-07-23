@@ -56,25 +56,40 @@ static void	child_two(int *fd, char **argv, char **envp)
 static void	wait_and_check(pid_t pid, char *cmd)
 {
 	int	status;
+	int	exit_code;
+	int	signal_code;
 
 	waitpid(pid, &status, 0);
-	if (WIFEXITED(status))
+	if ((status & 0x7F) == 0) // proceso terminó normalmente
 	{
-		int code = WEXITSTATUS(status);
-		if (code == 127)
-			fprintf(stderr, "Command not found: %s\n", cmd);
-		else if (code == 126)
-			fprintf(stderr, "Permission denied: %s\n", cmd);
-		exit(code);
+		exit_code = (status >> 8) & 0xFF;
+		if (exit_code == 127)
+		{
+			write(2, "Command not found: ", 20);
+			write(2, cmd, ft_strlen(cmd));
+			write(2, "\n", 1);
+		}
+		else if (exit_code == 126)
+		{
+			write(2, "Permission denied: ", 20);
+			write(2, cmd, ft_strlen(cmd));
+			write(2, "\n", 1);
+		}
+		exit(exit_code);
 	}
-	else if (WIFSIGNALED(status))
+	else if ((status & 0x7F) != 0) // terminó por señal
 	{
-		int sig = WTERMSIG(status);
-		fprintf(stderr, "Command '%s' terminated by signal %d\n", cmd, sig);
-		exit(128 + sig);
+		signal_code = status & 0x7F;
+		write(2, "Command '", 9);
+		write(2, cmd, ft_strlen(cmd));
+		write(2, "' terminated by signal ", 24);
+		ft_putnbr_fd(128 + signal_code, 2); // si tienes esta función en libft
+		write(2, "\n", 1);
+		exit(128 + signal_code);
 	}
 	exit(1);
 }
+
 
 static int	setup_and_fork(int *fd, char **argv, char **envp)
 {

@@ -58,3 +58,13 @@ void	handle_wait(int status, char *cmd)
 }
 
 
+void	wait_and_check(pid_t pid, char *cmd)
+{
+	int	status;
+
+	waitpid(pid, &status, 0);
+	handle_wait(status, cmd);
+}
+
+
+

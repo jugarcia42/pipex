@@ -1,6 +1,6 @@
 NAME = pipex
 
-SRC = main.c pipex.c cmd_utils.c ft_free_split.c
+SRC = main.c pipex.c cmd_utils.c ft_free_split.c child.c child_processes.c wait_utils.c
 
 OBJ = $(SRC:.c=.o)
 

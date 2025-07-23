@@ -21,8 +21,6 @@
 
 # include "libft/libft.h"
 
-void	ft_free_split(char **arr);
-
 char	*get_cmd_path(char *cmd, char **envp);
 
 void	execute_cmd(char *cmd_str, char **envp);

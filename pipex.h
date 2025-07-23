@@ -23,5 +23,8 @@
 void    execute_cmd(char *cmd_str, char **envp);
 char    *get_cmd_path(char *cmd, char **envp);
 int     setup_and_fork(int *fd, char **argv, char **envp);
+void    child_one(int *fd, char **argv, char **envp);
+void    child_two(int *fd, char **argv, char **envp);
+void    wait_and_check(pid_t pid, char *cmd);
 
 #endif

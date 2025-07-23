@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "pipex.h"
-#include "libft/libft.h"
 
 void	ft_free_split(char **arr)
 {

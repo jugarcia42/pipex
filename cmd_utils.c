@@ -79,4 +79,3 @@ char	*get_cmd_path(char *cmd, char **envp)
 		return (ft_strdup("NO_EXEC_PERMISSION"));
 	return (NULL);
 }
-

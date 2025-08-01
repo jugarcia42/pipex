@@ -53,8 +53,10 @@ int	setup_and_fork(int *fd, char **argv, char **envp)
 	pid2 = create_child_two(fd, argv, envp);
 	close(fd[0]);
 	close(fd[1]);
-	code2 = wait_and_check(pid2, argv[3]);
 	code1 = wait_and_check(pid1, argv[2]);
+	if (code1 != 0)
+		return (code1);
+	code2 = wait_and_check(pid2, argv[3]);
 	if (code2 != 0)
 		return (code2);
 	return (code1);

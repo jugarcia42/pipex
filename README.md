@@ -1,87 +1,217 @@
 # Pipex
 
-## Descripción
+## About
 
-Pipex es un proyecto cuyo objetivo es comprender el funcionamiento de los pipes y la redirección de archivos en sistemas Unix. El programa reproduce el comportamiento de una tubería de comandos en la terminal utilizando llamadas al sistema.
+Pipex is a system programming project from the 42 School curriculum that recreates the behavior of Unix pipes and command redirections. The objective is to understand how processes communicate through pipes, how file descriptors work, and how commands are executed using system calls such as `fork()`, `pipe()`, `dup2()`, and `execve()`.
 
-A través de este proyecto se trabaja con procesos, pipes, ejecución de comandos y gestión de archivos.
+This project provides a deeper understanding of process creation, inter-process communication, and the Unix execution environment.
 
-## Conceptos trabajados
+## The Challenge
 
-- Procesos (`fork`)
-- Pipes (`pipe`)
-- Redirecciones de entrada y salida
-- Ejecución de programas (`execve`)
-- Gestión de descriptores de archivo
-- Variables de entorno
-- Manejo de errores
-- Programación de sistemas Unix
-
-## Compilación
-
-Para compilar el proyecto:
+The program must reproduce the behavior of the following shell command:
 
 ```bash
-make
+< file1 cmd1 | cmd2 > file2
 ```
 
-Esto generará el ejecutable:
+Which is equivalent to:
 
 ```bash
-pipex
+./pipex file1 "cmd1" "cmd2" file2
 ```
 
-### Reglas disponibles
+The output of the first command is redirected through a pipe and used as the input of the second command, while the final result is written to the output file.
 
-```bash
-make
-make clean
-make fclean
-make re
-```
+## Features
 
-## Uso
+- Multiple process creation using `fork()`.
+- Inter-process communication through pipes.
+- Input and output file redirection.
+- Command execution with `execve()`.
+- Environment path resolution.
+- Error handling and resource cleanup.
+- Support for the mandatory and bonus parts.
+
+## Usage
+
+### Mandatory Part
 
 ```bash
 ./pipex infile "cmd1" "cmd2" outfile
 ```
 
-### Ejemplo
+Example:
 
 ```bash
 ./pipex infile "grep hello" "wc -l" outfile
 ```
 
-Este comando reproduce el comportamiento de:
+Equivalent shell command:
 
 ```bash
 < infile grep hello | wc -l > outfile
 ```
 
-## Funcionamiento
+## Bonus Part
 
-El programa:
+The bonus version supports multiple commands and here documents.
 
-1. Lee los datos desde el archivo de entrada.
-2. Ejecuta el primer comando.
-3. Envía la salida del primer comando a través de un pipe.
-4. Ejecuta el segundo comando utilizando la salida del primero como entrada.
-5. Guarda el resultado final en el archivo de salida.
+### Multiple Pipes
 
-## Gestión de errores
+```bash
+./pipex infile "cmd1" "cmd2" "cmd3" ... "cmdn" outfile
+```
 
-El programa maneja errores relacionados con:
+Equivalent shell command:
 
-- Archivos inexistentes o inaccesibles.
-- Comandos inválidos.
-- Errores de permisos.
-- Fallos en llamadas al sistema.
-- Problemas de memoria.
+```bash
+< infile cmd1 | cmd2 | cmd3 | ... | cmdn > outfile
+```
 
-## Objetivo
+### Here Document
 
-El objetivo principal es entender cómo los procesos se comunican entre sí mediante pipes y cómo funciona internamente la ejecución de comandos encadenados en una shell Unix.
+```bash
+./pipex here_doc LIMITER "cmd1" "cmd2" outfile
+```
 
-## Autor
+Equivalent shell command:
 
-Proyecto realizado como parte del programa de formación de 42.
+```bash
+cmd1 << LIMITER | cmd2 >> outfile
+```
+
+## Example
+
+```bash
+./pipex infile "cat" "grep error" outfile
+```
+
+Output flow:
+
+```text
+infile
+   │
+   ▼
+  cat
+   │
+   ▼
+grep error
+   │
+   ▼
+outfile
+```
+
+## Project Structure
+
+```text
+pipex/
+├── includes/
+│   └── pipex.h
+├── src/
+│   ├── parsing/
+│   ├── execution/
+│   ├── pipes/
+│   ├── heredoc/
+│   └── utils/
+├── Makefile
+└── README.md
+```
+
+## Compilation
+
+Compile the project:
+
+```bash
+make
+```
+
+Available Makefile rules:
+
+```bash
+make
+make bonus
+make clean
+make fclean
+make re
+```
+
+The compilation generates:
+
+```bash
+./pipex
+```
+
+## System Calls Used
+
+The project relies on several Unix system calls:
+
+```c
+open()
+close()
+read()
+write()
+fork()
+pipe()
+dup()
+dup2()
+execve()
+access()
+wait()
+waitpid()
+```
+
+These functions are essential for process management, file handling, and inter-process communication.
+
+## Implementation Details
+
+### Process Creation
+
+Each command is executed in a separate child process created using `fork()`.
+
+### Pipes
+
+Pipes are used to redirect the output of one process to the input of another.
+
+### Redirections
+
+Input and output files are managed through file descriptors and duplicated using `dup2()`.
+
+### Command Execution
+
+Commands are located using the `PATH` environment variable and executed with `execve()`.
+
+### Error Management
+
+The program handles:
+
+- Invalid files.
+- Missing permissions.
+- Nonexistent commands.
+- System call failures.
+- Memory allocation errors.
+
+All allocated resources and file descriptors are properly released before termination.
+
+## Learning Objectives
+
+Through this project, I gained experience with:
+
+- Unix process management.
+- File descriptors.
+- Pipes and inter-process communication.
+- Process synchronization.
+- Environment variables.
+- Command execution with `execve()`.
+- Error handling in system-level applications.
+- Resource management and memory safety.
+
+## Technologies
+
+- C
+- Unix/Linux System Calls
+- Process Management
+- Pipes
+- File Descriptors
+- Makefile
+
+Developed as part of the 42 School curriculum.
